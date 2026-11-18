@@ -1,0 +1,87 @@
+<!-- Copy the <section> into your page container for #/appointments and the <script> code into your existing script. -->
+<section id="page-appointments" hidden>
+  <form id="appt-form">
+    <select id="appt-type">
+      <option>Check-in call</option>
+      <option>Meal plan review</option>
+      <option>Progress review</option>
+      <option>Intro session</option>
+    </select>
+    <input id="appt-date" type="date" required />
+    <input id="appt-time" type="time" required />
+    <label><input id="appt-reminder" type="checkbox" /> Remind me</label>
+    <button type="submit">Book</button>
+  </form>
+  <p id="appt-error" role="alert"></p>
+  <ul id="appt-list"></ul>
+</section>
+
+<script>
+// One helper for every call: sends the cookie, turns errors into messages.
+async function api(path, options = {}) {
+  const res = await fetch('/api' + path, {
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401) { location.hash = '#/login'; throw new Error(data.error || 'Please log in'); }
+  if (!res.ok) throw new Error(data.error || 'Something went wrong');
+  return data;
+}
+
+const apptError = document.getElementById('appt-error');
+const apptList = document.getElementById('appt-list');
+
+async function loadAppointments() {
+  try {
+    apptError.textContent = '';
+    const items = await api('/appointments');
+    apptList.replaceChildren(...items.map(renderAppointment));
+  } catch (e) { apptError.textContent = e.message; }
+}
+
+function renderAppointment(a) {
+  const li = document.createElement('li');
+  li.textContent = `${a.date} ${a.time} · ${a.type} · ${a.coachName ?? 'No coach'} `;
+
+  const remind = document.createElement('input');
+  remind.type = 'checkbox';
+  remind.checked = a.reminder;
+  remind.addEventListener('change', async () => {
+    try { await api(`/appointments/${a.id}/reminder`, { method: 'PATCH', body: JSON.stringify({ reminder: remind.checked }) }); }
+    catch (e) { remind.checked = !remind.checked; apptError.textContent = e.message; }
+  });
+
+  const del = document.createElement('button');
+  del.textContent = 'Cancel';
+  del.addEventListener('click', async () => {
+    try { await api(`/appointments/${a.id}`, { method: 'DELETE' }); loadAppointments(); }
+    catch (e) { apptError.textContent = e.message; }
+  });
+
+  li.append(remind, del);
+  return li;
+}
+
+document.getElementById('appt-form').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  try {
+    await api('/appointments', {
+      method: 'POST',
+      body: JSON.stringify({
+        type: document.getElementById('appt-type').value,
+        date: document.getElementById('appt-date').value,
+        time: document.getElementById('appt-time').value,
+        reminder: document.getElementById('appt-reminder').checked,
+      }),
+    });
+    loadAppointments();
+  } catch (e) { apptError.textContent = e.message; }
+});
+
+// Load the list when your hash router opens this page.
+function onRoute() { if (location.hash === '#/appointments') loadAppointments(); }
+window.addEventListener('hashchange', onRoute);
+onRoute();
+</script>

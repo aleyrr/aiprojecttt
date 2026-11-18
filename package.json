@@ -1,0 +1,19 @@
+{
+  "name": "nutricare-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NutriCare REST API (Express + Postgres on Supabase), hosted on Vercel",
+  "engines": { "node": "20.x" },
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node --env-file=.env api/index.js",
+    "create-admin": "node --env-file=.env scripts/create-admin.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.1"
+  }
+}

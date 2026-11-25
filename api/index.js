@@ -13,6 +13,10 @@ app.use(express.json({
 app.use(cookieParser());
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
+app.get('/api/health/db', async (req, res) => {
+  try { await require('../src/db').q('select 1'); res.json({ ok: true, db: true }); }
+  catch (e) { res.status(500).json({ ok: false, db: false }); }
+});
 app.use('/api/auth', require('../src/routes/auth'));
 app.use('/api', require('../src/routes/clients'));
 app.use('/api', require('../src/routes/plans'));

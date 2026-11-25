@@ -13,7 +13,7 @@ A nutrition coaching web app for clients in Cairo. This repo holds the website (
 4. `npm start`, then open http://localhost:3000 and http://localhost:3000/api/health
 5. Create the admin: `ADMIN_EMAIL=you@example.com ADMIN_PASSWORD='a-long-password' npm run create-admin`
 
-There is no build step. The site is plain HTML/CSS/JS in `public/` and the API runs as one Vercel function.
+There is no build step. The site is one HTML file in `public/` and the API runs as one Vercel function.
 
 ## Deploy on Vercel
 
@@ -30,7 +30,7 @@ Vercel's free Hobby plan is for non-commercial use; check their terms before cha
 ## Layout
 
 ```
-public/                 the website (index.html = booking page, meal-plans, dashboard, login)
+public/index.html         the website (one file, pages switch by URL hash)
 api/index.js            Express app (exported for Vercel)
 src/db.js               pg Pool + transaction helper
 src/auth.js             bcrypt, JWT cookie, role checks

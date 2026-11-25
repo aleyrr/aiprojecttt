@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.get('/api/health/db', async (req, res) => {
   try { await require('../src/db').q('select 1'); res.json({ ok: true, db: true }); }
-  catch (e) { res.status(500).json({ ok: false, db: false }); }
+  catch (e) { console.error('db check failed:', e.code, e.message); res.status(500).json({ ok: false, db: false, code: e.code || null }); }
 });
 app.use('/api/auth', require('../src/routes/auth'));
 app.use('/api', require('../src/routes/clients'));

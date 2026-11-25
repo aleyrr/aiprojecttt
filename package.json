@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "NutriCare REST API (Express + Postgres on Supabase), hosted on Vercel",
-  "engines": { "node": "20.x" },
+  "engines": { "node": "22.x" },
   "main": "api/index.js",
   "scripts": {
     "start": "node --env-file=.env api/index.js",
